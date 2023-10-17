@@ -1,12 +1,15 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import md5 from "md5";
 import express from "express";
 import bodyParser from "body-parser";
 import ejs from "ejs";
 import mongoose from "mongoose";
 //import encrypt from "mongoose-encryption";
+//import md5 from "md5";
+import bcrypt from "bcrypt";
+
+const saltRounds=10;
 
 
 const app = express();
@@ -50,15 +53,21 @@ app.get("/register", function(req,res){
 });
 
 app.post("/register",function(req,res){
-    const newUser = new User({
-        email: req.body.username,
-        password: md5(req.body.password)
-    });
-   
 
-    newUser.save();
-    console.log(req.body.username + " registered successfuly :)");
-    res.render("secrets");
+    bcrypt.hash(req.body.password,saltRounds,function(err,hash){
+        const newUser = new User({
+            email: req.body.username,
+            password: hash
+        });
+       
+    
+        newUser.save();
+        console.log(req.body.username + " registered successfuly :)");
+        res.render("secrets");
+
+    });
+
+    
 });
 // verifying credentials and allowing login based on that
 app.post("/login", async function(req,res){
@@ -67,12 +76,14 @@ app.post("/login", async function(req,res){
 
     const found = await User.findOne({email : username});
     if(found){
-        if(found.password === md5(password)){
-            console.log("Logged in Successfully to Secrets :) ");
-            res.render("secrets");
-        }else{
-            console.log("Password you entered was wrong :( , enter correct password");
-        }
+        bcrypt.compare(password,found.password,function(req,result){
+            if(result === true){
+                console.log("Logged in Successfully to Secrets :) ");
+                res.render("secrets");
+            }else{
+                console.log("Password you entered was wrong :( , enter correct password");
+            }
+        });
     }else{
         console.log("Either of your email or password is incorrect or you may not be a registered user. Register yourself.");
     }
