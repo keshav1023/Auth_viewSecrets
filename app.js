@@ -15,13 +15,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
 
-const dbURL = "mongodb+srv://lmessi10:lmessi10@cluster0.dvkiufo.mongodb.net/userDB?retryWrites=true&w=majority";
+
 
 const connectionParams={
     useNewUrlParser: true,
     useUnifiedTopology: true
 }
-mongoose.connect(dbURL, connectionParams).then(()=>{
+mongoose.connect(process.env.URL, connectionParams).then(()=>{
     console.info("Connected to userDB")
 }).catch((e)=>{
     console.log("Error:",e);
