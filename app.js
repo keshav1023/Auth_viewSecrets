@@ -53,7 +53,7 @@ app.post("/register",function(req,res){
     console.log(req.body.username + " registered successfuly :)");
     res.render("secrets");
 });
-
+// verifying credentials and allowing login based on that
 app.post("/login", async function(req,res){
     const username= req.body.username;
     const password= req.body.password;
