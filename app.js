@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import ejs from "ejs";
 import mongoose from "mongoose";
+import encrypt from "mongoose-encryption";
 
 const app = express();
 const port = 3000;
@@ -22,10 +23,13 @@ mongoose.connect(dbURL, connectionParams).then(()=>{
     console.log("Error:",e);
 })
 
-const userSchema ={
+const userSchema = new mongoose.Schema({
     email: String,
     password: String
-}
+});
+
+const secret =  "Thisisourlittlesecret.";
+userSchema.plugin(encrypt, {secret: secret, encryptedFields: ["password"]});
 
 const User = new mongoose.model("User", userSchema);
 
